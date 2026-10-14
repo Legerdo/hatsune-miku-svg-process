@@ -1,0 +1,129 @@
+{
+  "status": "PASS",
+  "checks": {
+    "session_sha_matches_source": true,
+    "all_final_paths_loaded": true,
+    "all_underpainting_loaded": true,
+    "all_sketch_strokes_loaded": true,
+    "real_play_button_advances_time": true,
+    "real_pause_button_stops_time": true,
+    "speed_control": true,
+    "stage_selection_seeks_to_boots": true,
+    "stage_title_is_korean": true,
+    "face_zoom_button": true,
+    "sleeve_zoom_button": true,
+    "keyboard_scrub_reaches_end": true,
+    "all_2393_drawing_operations_complete": true,
+    "underpainting_removed_at_finish": true,
+    "all_12_batches_and_final_hold": true,
+    "cleanup_lasts_two_seconds": true,
+    "no_browser_exceptions": true,
+    "offline_without_network_requests": true,
+    "drawing_is_not_blank": true
+  },
+  "html_sha256": "b38a9ec583e444a6578fdfd807cada092b00d12bb5030ab52f669d9c90b54a90",
+  "duration_seconds": 292,
+  "canvas_size": [
+    1920,
+    1080
+  ],
+  "render_comparison": {
+    "method": "Completed player art crop against separately Chromium-rendered final SVG PNG at matched dimensions; subpixel registration and Canvas antialiasing may differ. Descriptive comparison.",
+    "mean_absolute_error": 3.1985078771670667
+  },
+  "browser_errors": [],
+  "external_requests": [],
+  "chapters": [
+    {
+      "start": 0,
+      "end": 8.987232193642404,
+      "kind": "sketch",
+      "title": "움직임과 인체 비례",
+      "ops": 28
+    },
+    {
+      "start": 9.887232193642404,
+      "end": 23.899999999999988,
+      "kind": "sketch",
+      "title": "윤곽선과 구조선",
+      "ops": 43
+    },
+    {
+      "start": 24.799999999999986,
+      "end": 31.537058251766357,
+      "kind": "under",
+      "title": "큰 색면과 밑색",
+      "ops": 42
+    },
+    {
+      "start": 32.43705825176636,
+      "end": 50.41472540548911,
+      "kind": "under",
+      "title": "색면 연결과 명도",
+      "ops": 160
+    },
+    {
+      "start": 51.314725405489106,
+      "end": 66.59794905805923,
+      "kind": "under",
+      "title": "얼굴과 손의 구조",
+      "ops": 180
+    },
+    {
+      "start": 67.49794905805923,
+      "end": 100.83893335209102,
+      "kind": "under",
+      "title": "빛과 그림자의 입체감",
+      "ops": 340
+    },
+    {
+      "start": 101.73893335209102,
+      "end": 128.87579469061063,
+      "kind": "final",
+      "title": "눈과 헤드셋",
+      "ops": 281
+    },
+    {
+      "start": 129.77579469061064,
+      "end": 178.10182340108122,
+      "kind": "final",
+      "title": "옷 주름과 소매 장치",
+      "ops": 432
+    },
+    {
+      "start": 179.00182340108123,
+      "end": 207.32090197028901,
+      "kind": "final",
+      "title": "왼쪽 트윈테일",
+      "ops": 245
+    },
+    {
+      "start": 208.22090197028902,
+      "end": 245.06025233740365,
+      "kind": "final",
+      "title": "오른쪽 트윈테일",
+      "ops": 329
+    },
+    {
+      "start": 245.96025233740366,
+      "end": 278.0000000000007,
+      "kind": "final",
+      "title": "부츠 봉제선과 반사광",
+      "ops": 313
+    },
+    {
+      "start": 278.0000000000007,
+      "end": 280.0000000000007,
+      "kind": "clean",
+      "title": "밑색 제거와 최종 정리",
+      "ops": 0
+    },
+    {
+      "start": 280.0000000000007,
+      "end": 292,
+      "kind": "hold",
+      "title": "완성된 벡터 일러스트",
+      "ops": 0
+    }
+  ]
+}

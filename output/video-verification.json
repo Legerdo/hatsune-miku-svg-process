@@ -1,0 +1,123 @@
+{
+  "status": "PASS",
+  "checks": {
+    "full_stream_decodes_without_error": true,
+    "full_hd_1920x1080": true,
+    "frame_rate_24": true,
+    "full_292_second_timeline": true,
+    "all_requested_sample_frames_decode": true,
+    "final_art_matches_separate_player_render": true,
+    "final_frame_is_not_initial_blank": true
+  },
+  "video_sha256": "a87ad270d5c3e888bcc654321994369319a59cd59172333068e2f018b27612f1",
+  "dimensions": [
+    1920,
+    1080
+  ],
+  "fps": 24.0,
+  "decoded_frame_count": 7008,
+  "duration_seconds": 292.0,
+  "full_stream_decoder_exit": 0,
+  "full_stream_decoder_errors": "",
+  "final_art_comparison": {
+    "reference": "Independently rendered completed HTML player, recording/prime-qa/player-292.png",
+    "mean_absolute_error": 2.0858604598339543,
+    "acceptance_mean_absolute_error_below": 3.0,
+    "pixel_range": [
+      0,
+      255
+    ]
+  },
+  "sample_frames": [
+    {
+      "frame": 0,
+      "seconds": 0.0,
+      "file": "recording\\prime-qa\\video-frame-00000.png",
+      "art_mean_rgb": [
+        254.999,
+        254.9988,
+        254.999
+      ]
+    },
+    {
+      "frame": 168,
+      "seconds": 7.0,
+      "file": "recording\\prime-qa\\video-frame-00168.png",
+      "art_mean_rgb": [
+        253.9582,
+        254.134,
+        254.1908
+      ]
+    },
+    {
+      "frame": 528,
+      "seconds": 22.0,
+      "file": "recording\\prime-qa\\video-frame-00528.png",
+      "art_mean_rgb": [
+        252.7432,
+        253.0903,
+        253.2167
+      ]
+    },
+    {
+      "frame": 1320,
+      "seconds": 55.0,
+      "file": "recording\\prime-qa\\video-frame-01320.png",
+      "art_mean_rgb": [
+        193.1425,
+        213.6472,
+        212.5625
+      ]
+    },
+    {
+      "frame": 2400,
+      "seconds": 100.0,
+      "file": "recording\\prime-qa\\video-frame-02400.png",
+      "art_mean_rgb": [
+        191.0534,
+        212.4764,
+        211.4866
+      ]
+    },
+    {
+      "frame": 3840,
+      "seconds": 160.0,
+      "file": "recording\\prime-qa\\video-frame-03840.png",
+      "art_mean_rgb": [
+        189.6988,
+        211.6252,
+        210.5265
+      ]
+    },
+    {
+      "frame": 5280,
+      "seconds": 220.0,
+      "file": "recording\\prime-qa\\video-frame-05280.png",
+      "art_mean_rgb": [
+        187.761,
+        209.9514,
+        208.8124
+      ]
+    },
+    {
+      "frame": 6480,
+      "seconds": 270.0,
+      "file": "recording\\prime-qa\\video-frame-06480.png",
+      "art_mean_rgb": [
+        186.4987,
+        208.85,
+        207.6847
+      ]
+    },
+    {
+      "frame": 7007,
+      "seconds": 291.9583333333333,
+      "file": "recording\\prime-qa\\video-frame-07007.png",
+      "art_mean_rgb": [
+        186.9196,
+        208.919,
+        207.7766
+      ]
+    }
+  ]
+}

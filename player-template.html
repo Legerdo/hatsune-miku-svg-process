@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>하츠네 미쿠 | 벡터 제작 과정</title>
+<style>
+  :root { color-scheme:light; --ink:#20313a; --muted:#657780; --line:#d6ddd9; --paper:#fff; --ground:#f4f3ef; --accent:#188d8c; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#edede9; color:var(--ink); font:15px/1.5 "Malgun Gothic","Apple SD Gothic Neo","Segoe UI",sans-serif; }
+  button, select, input { font:inherit; }
+  button { cursor:pointer; transition: background .15s, border-color .15s; }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline:3px solid #74bfb6; outline-offset:3px; }
+  .shell { width:min(1540px,calc(100% - 44px)); margin:28px auto 44px; }
+  .mast { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:15px; }
+  .identity { display:flex; align-items:center; gap:11px; color:#344951; font-weight:800; letter-spacing:.14em; font-size:12px; }
+  .stamp { display:grid; place-items:center; border:1.5px solid #438e8c; border-radius:50%; color:#267776; font-size:10px; letter-spacing:0; width:34px; height:34px; }
+  .mast-meta { font-size:12px; color:var(--muted); letter-spacing:.05em; }
+  .viewport { padding:7px; background:#fcfcfb; border:1px solid #d8deda; border-radius:11px; box-shadow:0 9px 40px #223c4714; }
+  #screen { display:block; width:100%; height:auto; aspect-ratio:16/9; background:#f5f4f0; border-radius:5px; }
+  .controller { margin-top:16px; border:1px solid #dae0dc; background:rgba(255,255,255,.88); border-radius:11px; padding:17px 20px 13px; }
+  .transport { display:flex; align-items:center; gap:15px; }
+  .primary { background:#1d5356; color:white; border:1px solid #1d5356; border-radius:6px; min-width:93px; padding:10px 15px; font-weight:700; }
+  .primary:hover { background:#316c70; }
+  .secondary { color:#3a535b; border:1px solid var(--line); background:#fafbf9; border-radius:6px; padding:9px 13px; }
+  .secondary:hover { background:#ebf4f1; border-color:#a6beb8; }
+  .transport input { flex:1; min-width:60px; accent-color:#217c7b; cursor:pointer; }
+  .clock { min-width:50px; text-align:center; color:#37565e; font:600 12px "Segoe UI",sans-serif; font-variant-numeric:tabular-nums; }
+  .toolbar { border-top:1px solid #e2e6e3; margin-top:15px; padding-top:13px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:13px; }
+  .group { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+  .field-label { font-size:12px; color:#61727c; margin-right:2px; }
+  select { color:#2c494f; background:#fff; border:1px solid var(--line); border-radius:6px; padding:8px 28px 8px 10px; max-width:220px; }
+  .tiny { padding:7px 10px; min-width:36px; }
+  .focus-btn { color:#566a70; background:#fff; border:1px solid var(--line); border-radius:6px; padding:7px 11px; }
+  .focus-btn.active { color:#146d6d; border-color:#76b6ad; background:#e3f3ef; font-weight:700; }
+  .foot { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 25px; margin-top:12px; font-size:11px; color:#718188; }
+  .foot a { color:#44696c; }
+  @media(max-width:800px){.shell{width:calc(100% - 18px);margin:10px auto}.mast{padding:0 8px}.mast-meta{display:none}.controller{padding:13px}.transport{gap:7px}.toolbar{gap:10px}.field-label{font-size:11px}.focus-btn{padding:5px 8px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="mast">
+    <div class="identity"><span class="stamp">V/01</span> THE VECTOR ATELIER <span style="font-weight:400; color:#85949b">/ PROCESS ARCHIVE</span></div>
+    <div class="mast-meta">STUDY NO. 01 · ORIGINAL ART BY KEI</div>
+  </header>
+  <main>
+    <div class="viewport"><canvas id="screen" width="1920" height="1080" role="img" aria-label="하츠네 미쿠 벡터 드로잉 제작과정 애니메이션"></canvas></div>
+    <section class="controller" aria-label="애니메이션 재생 설정">
+      <div class="transport">
+        <button class="primary" id="play" type="button" aria-label="재생 또는 일시정지">▶ 재생</button>
+        <button class="secondary" id="restart" type="button" aria-label="처음부터 재생">↻ 처음</button>
+        <span class="clock" id="elapsed">00:00</span>
+        <input id="scrub" type="range" min="0" max="100" step="0.001" value="0" aria-label="제작 과정 탐색">
+        <span class="clock" id="length">00:00</span>
+      </div>
+      <div class="toolbar">
+        <div class="group">
+          <span class="field-label">제작 단계</span>
+          <button class="secondary tiny" id="previous" type="button" aria-label="이전 단계">←</button>
+          <select id="chapters" aria-label="제작 단계 선택"></select>
+          <button class="secondary tiny" id="next" type="button" aria-label="다음 단계">→</button>
+        </div>
+        <div class="group">
+          <label class="field-label" for="speed">재생 속도</label>
+          <select id="speed" aria-label="재생 속도"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option><option value="4">4×</option></select>
+          <span class="field-label" style="margin-left:9px">확대</span>
+          <button class="focus-btn active" data-focus="full" type="button" aria-pressed="true">전체</button>
+          <button class="focus-btn" data-focus="face" type="button" aria-pressed="false">얼굴</button>
+          <button class="focus-btn" data-focus="sleeve" type="button" aria-pressed="false">소매</button>
+        </div>
+      </div>
+      <div class="foot">
+        <span>모든 붓 터치와 형태는 세션의 SVG 경로로 재현됩니다. 단계별 드로잉을 재구성한 시뮬레이션입니다.</span>
+        <span>Hatsune Miku © Crypton Future Media, INC. 2007 · KEI · <a href="https://piapro.net/intl/en_character.html" target="_blank" rel="noreferrer">CC BY-NC 3.0 / Source</a></span>
+      </div>
+    </section>
+  </main>
+</div>
+<script id="session-data" type="application/json">__EMBEDDED_SESSION_JSON__</script>
+<script id="player-settings" type="application/json">__PLAYER_CONFIGURATION_JSON__</script>
+<script>
+(() => {
+  'use strict';
+  const DATA = JSON.parse(document.getElementById('session-data').textContent);
+  const CFG = JSON.parse(document.getElementById('player-settings').textContent);
+  const W = DATA.width, H = DATA.height, TOTAL = CFG.duration;
+  const elements = {
+    canvas:document.getElementById('screen'), play:document.getElementById('play'),
+    restart:document.getElementById('restart'), scrub:document.getElementById('scrub'),
+    elapsed:document.getElementById('elapsed'), length:document.getElementById('length'),
+    previous:document.getElementById('previous'), next:document.getElementById('next'),
+    chapters:document.getElementById('chapters'), speed:document.getElementById('speed')
+  };
+  const main = elements.canvas.getContext('2d', {alpha:false});
+  if (!main || typeof Path2D !== 'function') throw new Error('Canvas Path2D is required');
+  const CACHE_SCALE = 4;
+  function makeArtCanvas() {
+    const canvas = document.createElement('canvas');
+    canvas.width=Math.round(W*CACHE_SCALE); canvas.height=Math.round(H*CACHE_SCALE);
+    const context=canvas.getContext('2d');
+    context.setTransform(CACHE_SCALE,0,0,CACHE_SCALE,0,0);
+    context.lineJoin='round'; context.lineCap='round';
+    return {canvas,context};
+  }
+  const underCache=makeArtCanvas(), finalCache=makeArtCanvas(), art=makeArtCanvas();
+  const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+  const smooth=v=>{v=clamp(v);return v*v*(3-2*v);};
+  const hex=rgb=>`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+  const pad=n=>String(n).padStart(2,'0');
+  const fmt=seconds=>`${pad(Math.floor(seconds/60))}:${pad(Math.floor(seconds%60))}`;
+  const opBounds=(p)=>Array.isArray(p.bounds)&&p.bounds.length===4?p.bounds:[0,0,W,H];
+  function svgGeometryLength(d) {
+    const node=document.createElementNS('http://www.w3.org/2000/svg','path');
+    node.setAttribute('d',d);
+    try{return Math.max(1,node.getTotalLength());}catch(_){return 1;}
+  }
+  const getPath=op=>op.curve||(op.curve=new Path2D(op.item.d));
+  function makeStroke(s,i) {
+    const length=svgGeometryLength(s.d);
+    return {item:s,index:i,length,curve:new Path2D(s.d),start:0,end:0,phase:'sketch'};
+  }
+  const strokes=(DATA.strokes||[]).map(makeStroke);
+  const underpainting=DATA.underpainting||[];
+  const finals=DATA.paths||[];
+  const batchData=(DATA.batches||[]).slice().sort((a,b)=>a.id-b.id);
+  const paints=[];
+  let index=0;
+  for(const b of batchData){
+    for(const item of underpainting) if(item.batch===b.id) paints.push({item, index:index++, phase:'under', batch:b, start:0,end:0});
+    for(const item of finals) if(item.batch===b.id) paints.push({item,index:index++,phase:'final',batch:b,start:0,end:0});
+  }
+  // Malformed batch metadata must not silently lose any drawn SVG paths.
+  for(const item of underpainting) if(!paints.some(op=>op.item===item)) paints.push({item,index:index++,phase:'under',batch:{id:item.batch,title:'underpainting'},start:0,end:0});
+  for(const item of finals) if(!paints.some(op=>op.item===item)) paints.push({item,index:index++,phase:'final',batch:{id:item.batch,title:'detail'},start:0,end:0});
+  const strokeWeight=s=>.7+Math.sqrt(s.length)/8;
+  const paintWeight=op=>{
+    const b=opBounds(op.item);
+    return .43 + .22*Math.log2(Math.max(1,+op.item.area||1)+1) + .0015*Math.hypot(b[2]-b[0],b[3]-b[1]);
+  };
+  const koreanStages={
+    'gesture-and-proportion':['움직임과 인체 비례','인물의 중심축과 전체 비례를 잡고, 양쪽 머리카락과 팔·다리의 큰 흐름을 구성합니다.'],
+    'contour-construction':['윤곽선과 구조선','외곽선을 따라 큰 형태를 확정하고, 얼굴·의상·소매·장식의 내부 구조선을 더합니다.'],
+    'large-color-blocks':['큰 색면과 밑색','피부·의상·머리카락의 기본 색을 나누고, 큰 덩어리부터 화면에 쌓아 올립니다.'],
+    'connected-masses-and-values':['색면 연결과 명도','서로 이어지는 색 영역을 다듬고, 밝은 면과 어두운 면의 기본 관계를 정리합니다.'],
+    'face-hands-and-structure':['얼굴과 손의 구조','눈·입·손끝처럼 작지만 중요한 부분에 세밀한 윤곽과 색면을 추가합니다.'],
+    'light-shadow-and-volume':['빛과 그림자의 입체감','광원 방향에 따라 밝고 어두운 면을 조정하고 옷과 머리카락의 볼륨을 강화합니다.'],
+    'eyes-face-and-headset':['눈과 헤드셋','눈동자와 얼굴의 인상, 헤드셋의 작은 구성 요소를 정밀한 경로로 표현합니다.'],
+    'fabric-folds-and-sleeve-controls':['옷 주름과 소매 장치','옷감의 접힘과 팔 장치의 버튼, 테두리와 미세한 반사광을 차례로 쌓습니다.'],
+    'left-twintail-strands':['왼쪽 트윈테일','왼쪽 머리카락의 방향과 가닥 사이의 음영·색 변화를 자세히 묘사합니다.'],
+    'right-twintail-light-and-flow':['오른쪽 트윈테일','오른쪽 머리카락의 흐름을 정돈하고 명암과 반사광을 자연스럽게 연결합니다.'],
+    'boots-seams-and-reflections':['부츠 봉제선과 반사광','허벅지의 경계, 부츠의 주름과 봉제선, 청록색 장식과 밑창의 반사를 완성합니다.'],
+    'overall-check-and-finish':['최종 디테일과 완성','모든 부분의 윤곽과 색 경계를 확인하고 마지막 작은 표현을 보완합니다.']
+  };
+  function koreanTitle(b,kind) {
+    const raw=String(b.title||'detail');
+    if(koreanStages[raw])return koreanStages[raw][0];
+    const t=raw.toLowerCase();
+    if(kind==='sketch') return /gesture|proportion/i.test(t)?'비례와 움직임':/contour|outline/i.test(t)?'윤곽과 구조':'구성선 연구';
+    if(/overall|finish|check/i.test(t)) return '최종 점검과 완성';
+    if(/eye|expression|face/i.test(t)) return '얼굴과 표정';
+    if(/sleeve|hand|arm/i.test(t)) return '소매와 손';
+    if(/hair|twin|fringe/i.test(t)) return '머리카락과 명암';
+    if(/skin/i.test(t)) return '피부와 빛';
+    if(/costume|clothes|uniform|fabric|dress/i.test(t)) return '의상과 주름';
+    if(/accessory|ribbon|tie|detail/i.test(t)) return '장식과 세부 묘사';
+    if(/shade|shadow|tone|light/i.test(t)) return '색조와 명암';
+    if(/base|block|mass|under|flat/i.test(t)) return '큰 색면 구성';
+    if(/refin|correction|edge/i.test(t)) return '형태와 윤곽 보정';
+    return raw.replace(/[-_]+/g,' ');
+  }
+  const groups=[];
+  for(const b of batchData){
+    const entries=strokes.filter(s=>s.item.batch===b.id);
+    if(entries.length) groups.push({batch:b,kind:'sketch',entries});
+  }
+  for(const b of batchData){
+    const entries=paints.filter(p=>p.item.batch===b.id);
+    if(entries.length) groups.push({batch:b,kind:entries[0].phase==='under'?'under':'final',entries});
+  }
+  // Fallback for data with operations but no recorded batch row.
+  if(!groups.length && strokes.length) groups.push({batch:{id:1,title:'drawing'},kind:'sketch',entries:strokes});
+  if(!groups.some(g=>g.kind!=='sketch') && paints.length) groups.push({batch:{id:2,title:'painting'},kind:'final',entries:paints});
+  const sketchBudget=strokes.length?Math.min(23,TOTAL*.112):0;
+  const holdBudget=Math.min(12,TOTAL*.048);
+  const cleanupBudget=DATA.finish_underpainting&&underpainting.length?Math.min(2,TOTAL*.012):0;
+  const pauseCount=Math.max(0,groups.length-1);
+  const pauseBudget=pauseCount?Math.min(TOTAL*.071,pauseCount*.9):0;
+  const onePause=pauseCount?pauseBudget/pauseCount:0;
+  const paintBudget=Math.max(.1,TOTAL-sketchBudget-holdBudget-cleanupBudget-pauseBudget);
+  const sw=strokes.reduce((s,p)=>s+strokeWeight(p),0);
+  const pw=paints.reduce((s,p)=>s+paintWeight(p),0);
+  const chapters=[];
+  let cursor=0;
+  for(let g=0;g<groups.length;g++) {
+    const group=groups[g],start=cursor;
+    for(const op of group.entries){
+      const span=group.kind==='sketch' ? sketchBudget*strokeWeight(op)/Math.max(1,sw)
+        : paintBudget*paintWeight(op)/Math.max(1,pw);
+      op.start=cursor;op.end=cursor+span;cursor=op.end;
+    }
+    chapters.push({index:chapters.length,kind:group.kind,batch:group.batch,
+      title:koreanTitle(group.batch,group.kind),start,end:cursor,ops:group.entries.length});
+    if(g<groups.length-1) cursor+=onePause;
+  }
+  const cleaningStart=cursor;
+  if(cleanupBudget){
+    chapters.push({index:chapters.length,kind:'clean',batch:{id:0,title:'final-cleanup',decision:'초기 색면을 정리하고 최종 SVG 레이어를 남깁니다.'},title:'밑색 제거와 최종 정리',start:cursor,end:cursor+cleanupBudget,ops:0});
+    cursor+=cleanupBudget;
+  }
+  const finishedStart=cursor;
+  chapters.push({index:chapters.length,kind:'hold',batch:{id:0,title:'finished-art',decision:'순수 SVG 경로로 완성된 작품을 감상합니다.'},title:'완성된 벡터 일러스트',start:cursor,end:TOTAL,ops:0});
+  // Floating-point accumulation may differ by a few nanoseconds.
+  const paintFirst=paints[0]?.start||0, paintLast=paints[paints.length-1]?.end||paintFirst;
+  function paintProgress(time){return clamp((time-paintFirst)/Math.max(.001,paintLast-paintFirst));}
+  function cleanupAlpha(time) {return cleanupBudget?1-smooth((time-cleaningStart)/cleanupBudget):1;}
+  function resetCache(cache){
+    cache.context.setTransform(1,0,0,1,0,0);
+    cache.context.clearRect(0,0,cache.canvas.width,cache.canvas.height);
+    cache.context.setTransform(CACHE_SCALE,0,0,CACHE_SCALE,0,0);
+  }
+  function drawFinished(ctx,op) {
+    ctx.save();
+    ctx.lineJoin='round';ctx.lineCap='round';
+    ctx.fillStyle=ctx.strokeStyle=hex(op.item.rgb);
+    ctx.lineWidth=Number.isFinite(+op.item.stroke_width)?+op.item.stroke_width:.16;
+    ctx.fill(getPath(op),'evenodd');
+    if(ctx.lineWidth>0) ctx.stroke(getPath(op));
+    ctx.restore();
+  }
+  let cached=0;
+  function updateCache(count) {
+    if(count<cached){resetCache(underCache);resetCache(finalCache);cached=0;}
+    while(cached<count){
+      const op=paints[cached++];
+      drawFinished((op.phase==='under'?underCache:finalCache).context,op);
+    }
+  }
+  function completedCount(time) {
+    let low=0,high=paints.length;
+    while(low<high){const mid=(low+high)>>1; if(paints[mid].end<=time)low=mid+1;else high=mid;}
+    return low;
+  }
+  function activePaint(time,count) {
+    if(count<paints.length && paints[count].start<=time && paints[count].end>time)return paints[count];
+    return null;
+  }
+  function renderSketch(time) {
+    const ctx=art.context;
+    const paintDone=paintProgress(time);
+    for(const st of strokes){
+      if(time<=st.start)continue;
+      const f=clamp((time-st.start)/Math.max(.0001,st.end-st.start));
+      // Construction marks fade over the first part of painting, with offsets
+      // so the removal is visibly gradual across separate guide strokes.
+      const fade=1-smooth((paintDone-.035-(st.index%11)*.011)/.43);
+      if(fade<=0)continue;
+      ctx.save();
+      ctx.strokeStyle=st.item.type==='gesture'?'#83a2af':'#78919e';
+      ctx.globalAlpha=.7*fade;
+      ctx.lineWidth=+st.item.width||.75;
+      ctx.lineCap='round';ctx.lineJoin='round';
+      ctx.setLineDash([Math.max(.001,st.length*f),st.length+8]);
+      ctx.stroke(st.curve);
+      ctx.restore();
+    }
+  }
+  function brushFill(ctx,op,progress){
+    if(progress<=0)return;
+    const b=opBounds(op.item);
+    const x0=b[0],y0=b[1],x1=b[2],y1=b[3];
+    const cx=x0+(x1-x0)*.12,cy=y0+(y1-y0)*.17;
+    const radius=Math.max(Math.hypot(x0-cx,y0-cy),Math.hypot(x1-cx,y1-cy),Math.hypot(x0-cx,y1-cy),Math.hypot(x1-cx,y0-cy))*(1.12*progress);
+    ctx.save();
+    ctx.clip(getPath(op),'evenodd');
+    ctx.fillStyle=hex(op.item.rgb);
+    ctx.beginPath();
+    for(let i=0;i<=52;i++){
+      const angle=2*Math.PI*i/52;
+      const rough=1+.019*Math.sin(i*2.11+op.index*.51)+.015*Math.sin(i*.82+op.index*.63);
+      const x=cx+radius*rough*Math.cos(angle),y=cy+radius*rough*Math.sin(angle);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
+  function drawActive(ctx,op,progress){
+    if(!op||progress<=0)return;
+    const path=getPath(op),p=clamp(progress);
+    ctx.save();
+    const color=hex(op.item.rgb),strokeWidth=Number.isFinite(+op.item.stroke_width)?+op.item.stroke_width:.16;
+    const contourProgress=smooth(p/.62);
+    ctx.strokeStyle=color;
+    ctx.globalAlpha=.86;
+    ctx.lineJoin='round';ctx.lineCap='round';
+    ctx.lineWidth=Math.max(.3,strokeWidth);
+    const len=op.perimeter||(op.perimeter=svgGeometryLength(op.item.d));
+    ctx.setLineDash([Math.max(.01,len*contourProgress),len+50]);
+    ctx.stroke(path);
+    ctx.setLineDash([]);
+    ctx.globalAlpha=1;
+    brushFill(ctx,op,smooth((p-.12)/.88));
+    ctx.restore();
+  }
+  function rebuildArt(time) {
+    const count=completedCount(time);
+    updateCache(count);
+    const active=activePaint(time,count);
+    resetCache(art);
+    renderSketch(time);
+    art.context.save();
+    art.context.globalAlpha=cleanupAlpha(time);
+    art.context.drawImage(underCache.canvas,0,0,W,H);
+    if(active?.phase==='under') drawActive(art.context,active,clamp((time-active.start)/(active.end-active.start)));
+    art.context.restore();
+    art.context.drawImage(finalCache.canvas,0,0,W,H);
+    if(active?.phase==='final')drawActive(art.context,active,clamp((time-active.start)/(active.end-active.start)));
+    return {count,active};
+  }
+  function chapterAt(time){
+    let cur=0;
+    for(let i=1;i<chapters.length;i++) if(time>=chapters[i].start) cur=i;
+    return cur;
+  }
+  function fillRounded(x,y,w,h,r,color){main.fillStyle=color;main.beginPath();main.roundRect(x,y,w,h,r);main.fill();}
+  function line(x,y,w,color='#dce3df'){main.fillStyle=color;main.fillRect(x,y,w,1);}
+  function text(str,x,y,size=20,color='#253d46',weight=400,font='"Malgun Gothic","Segoe UI",sans-serif'){
+    main.font=`${weight} ${size}px ${font}`;main.fillStyle=color;main.textAlign='left';main.textBaseline='alphabetic';main.fillText(String(str),x,y);
+  }
+  function paragraph(value,x,y,width,size=19,leading=33,maxLines=3){
+    const str=String(value||'');
+    main.font=`400 ${size}px "Malgun Gothic","Segoe UI",sans-serif`;
+    const tokens=str.split(/\s+/).filter(Boolean);
+    const lines=[];let current='';
+    for(const token of tokens){
+      const next=current?`${current} ${token}`:token;
+      if(main.measureText(next).width>width&&current){lines.push(current);current=token;}else current=next;
+    }
+    if(current)lines.push(current);
+    if(lines.length>maxLines){lines[maxLines-1]=lines[maxLines-1].slice(0,Math.max(6,lines[maxLines-1].length-2))+'…';}
+    lines.slice(0,maxLines).forEach((t,i)=>text(t,x,y+i*leading,size,'#66757b'));
+  }
+  function paintZoom(x,y,w,h,region){
+    const bounds=region==='face'?[174,0,155,205]:[110,244,245,233];
+    const sx=clamp(bounds[0],0,W-1)*CACHE_SCALE,sy=clamp(bounds[1],0,H-1)*CACHE_SCALE;
+    const sw=Math.min(bounds[2],W-bounds[0])*CACHE_SCALE,sh=Math.min(bounds[3],H-bounds[1])*CACHE_SCALE;
+    main.save();main.beginPath();main.roundRect(x,y,w,h,7);main.clip();
+    main.fillStyle='#fbfbf9';main.fillRect(x,y,w,h);
+    const k=Math.min(w/sw,h/sh);
+    const destW=sw*k,destH=sh*k;
+    main.drawImage(art.canvas,sx,sy,sw,sh,x+(w-destW)/2,y+(h-destH)/2,destW,destH);
+    main.restore();
+  }
+  function drawScreen(time,stats){
+    const stageIdx=chapterAt(time),stage=chapters[stageIdx],done=stats.count;
+    const fraction=time/TOTAL;
+    main.setTransform(1,0,0,1,0,0);
+    main.fillStyle='#f4f3ef';main.fillRect(0,0,1920,1080);
+    // Paper and artwork
+    fillRounded(58,56,893,968,13,'#e2e7e2');
+    fillRounded(53,49,893,968,10,'#ffffff');
+    line(108,101,782,'#ecefeb');
+    text('KEI / HATSUNE MIKU',113,91,13,'#71848b',700,'"Segoe UI",sans-serif');
+    text('VECTOR DRAWING STUDY',113,984,12,'#86969c',600,'"Segoe UI",sans-serif');
+    text('01 — 01',836,984,12,'#86969c',600,'"Segoe UI",sans-serif');
+    main.save();main.beginPath();main.roundRect(84,112,829,837,4);main.clip();
+    if(focus==='full'){
+      const h=807,w=h*W/H;
+      main.drawImage(art.canvas,0,0,art.canvas.width,art.canvas.height,84+(829-w)/2,127,w,h);
+    }else{
+      const b=focus==='face'?[117,0,303,330]:[92,225,306,330];
+      const k=Math.min(829/b[2],837/b[3]);
+      const dw=b[2]*k,dh=b[3]*k;
+      main.drawImage(art.canvas,b[0]*CACHE_SCALE,b[1]*CACHE_SCALE,b[2]*CACHE_SCALE,b[3]*CACHE_SCALE,84+(829-dw)/2,112+(837-dh)/2,dw,dh);
+    }
+    main.restore();
+    // Editorial panel
+    text('MOTION  /  VECTOR STUDY',1002,94,18,'#3c807f',700,'"Segoe UI",sans-serif');
+    text('하츠네 미쿠',999,175,54,'#263d43',800);
+    text('HATSUNE MIKU   /   AFTER KEI',1003,213,17,'#7a898c',500,'"Segoe UI",sans-serif');
+    line(1003,254,830,'#cdd8d4');
+    text(`ACT   ${pad(stageIdx+1)} / ${pad(chapters.length)}`,1003,302,16,'#388b87',700,'"Segoe UI",sans-serif');
+    text(stage.title,1000,358,38,'#273c42',700);
+    const typeText={sketch:'SKETCH  /  선의 움직임',under:'UNDERPAINT  /  기초 색면',final:'DETAIL  /  형태 정교화',clean:'CLEANUP  /  최종 레이어',hold:'COMPLETE  /  벡터 아트'}[stage.kind];
+    text(typeText,1003,400,16,'#338985',700);
+    paragraph(koreanStages[stage.batch.title]?.[1] || stage.batch.decision || '색과 형태를 순서대로 쌓아 이미지를 완성합니다.',1003,446,797,18,31,3);
+    line(1003,543,830,'#dbe1de');
+    text('제작 진행',1003,581,17,'#3d565d',700);
+    text(`${Math.round(fraction*100)}%`,1733,580,23,'#308987',700,'"Segoe UI",sans-serif');
+    fillRounded(1003,608,831,9,5,'#dce6e1');
+    if(fraction>0)fillRounded(1003,608,831*fraction,9,5,'#65a8a2');
+    text(fmt(time),1003,650,18,'#37595e',700,'"Segoe UI",sans-serif');
+    text('/  '+fmt(TOTAL),1071,650,15,'#8a999c',500,'"Segoe UI",sans-serif');
+    text(`채색 ${Math.min(paints.length,done+(stats.active?1:0)).toLocaleString('ko-KR')} / ${paints.length.toLocaleString('ko-KR')} 회`,1420,650,16,'#61777b',500);
+    // Contextual chapter markers
+    for(let row=0;row<3;row++){
+      const offset=row-1,idx=stageIdx+offset;
+      if(idx<0||idx>=chapters.length)continue;
+      const c=chapters[idx],yy=694+row*32;
+      if(offset===0)fillRounded(998,yy-22,840,31,4,'#e7f2ef');
+      text(pad(idx+1),1007,yy,13,offset===0?'#2d817c':'#9aa8a9',700,'"Segoe UI",sans-serif');
+      text(c.title,1064,yy,15,offset===0?'#2c615e':'#8c9a9b',offset===0?700:400);
+      if(offset===0)text('현재 단계',1737,yy,12,'#398b85',600);
+    }
+    // Two honest, live crops from the same vector-composited drawing.
+    line(1003,792,830,'#dbe1de');
+    text('DETAIL STUDIES',1004,821,15,'#648080',700,'"Segoe UI",sans-serif');
+    paintZoom(1004,840,172,132,'face');
+    paintZoom(1190,840,172,132,'sleeve');
+    text('FACE',1006,992,12,'#768b91',600,'"Segoe UI",sans-serif');
+    text('SLEEVE',1192,992,12,'#768b91',600,'"Segoe UI",sans-serif');
+    text('SVG  /  PATH BY PATH',1420,868,15,'#5a7479',700,'"Segoe UI",sans-serif');
+    text(`${strokes.length}개의 스케치 · ${underpainting.length}개의 밑색`,1420,908,16,'#647880');
+    text(`${finals.length}개의 최종 패스`,1420,938,16,'#647880');
+    text('기록을 바탕으로 재구성한 제작 과정',1420,974,14,'#99a6a8');
+    line(1003,1014,830,'#dbe1de');
+    text('Hatsune Miku © Crypton Future Media, INC. 2007  •  KEI  •  CC BY-NC 3.0',1004,1043,15,'#74868a',400,'"Segoe UI",sans-serif');
+  }
+  let time=0,speed=1,focus='full',playing=false,clockOrigin=0,lastDraw=-Infinity;
+  let capture=null;
+  function redraw(){
+    const stats=rebuildArt(time);
+    drawScreen(time,stats);
+    elements.scrub.value=String(time);
+    elements.elapsed.textContent=fmt(time);
+    elements.play.textContent=playing?'❚❚ 일시정지':'▶ 재생';
+    elements.chapters.value=String(chapterAt(time));
+  }
+  function seek(value){time=clamp(Number(value)||0,0,TOTAL);clockOrigin=performance.now()-1000*time/speed;redraw();return time;}
+  function pause(){playing=false;redraw();}
+  function play(){
+    if(time>=TOTAL)time=0;
+    playing=true;clockOrigin=performance.now()-1000*time/speed;redraw();
+  }
+  function setSpeed(value){
+    const v=Number(value);
+    if(!Number.isFinite(v)||v<=0)throw Error('Invalid speed');
+    speed=v;elements.speed.value=String(v);
+    clockOrigin=performance.now()-1000*time/speed;
+    return speed;
+  }
+  function setFocus(next){
+    if(!['full','face','sleeve'].includes(next))throw Error('Invalid zoom mode');
+    focus=next;
+    for(const button of document.querySelectorAll('[data-focus]')){
+      button.classList.toggle('active',button.dataset.focus===focus);
+      button.setAttribute('aria-pressed',String(button.dataset.focus===focus));
+    }
+    redraw();
+  }
+  function goChapter(step){
+    const next=clamp(chapterAt(time)+step,0,chapters.length-1);
+    seek(chapters[next].start);
+  }
+  function loop(now){
+    if(playing && now-lastDraw>=28){
+      time=clamp((now-clockOrigin)*speed/1000,0,TOTAL);
+      if(time>=TOTAL){playing=false;}
+      redraw();lastDraw=now;
+      if(capture && time>=capture.endTime) endCapture();
+    }
+    requestAnimationFrame(loop);
+  }
+  elements.length.textContent=fmt(TOTAL);
+  elements.scrub.max=String(TOTAL);
+  for(const c of chapters){
+    const node=document.createElement('option');
+    node.value=String(c.index);node.textContent=`${pad(c.index+1)} · ${c.title}`;
+    elements.chapters.appendChild(node);
+  }
+  elements.play.addEventListener('click',()=>playing?pause():play());
+  elements.restart.addEventListener('click',()=>{seek(0);play();});
+  elements.scrub.addEventListener('input',event=>seek(event.target.value));
+  elements.speed.addEventListener('change',event=>setSpeed(event.target.value));
+  elements.chapters.addEventListener('change',event=>seek(chapters[+event.target.value].start));
+  elements.previous.addEventListener('click',()=>goChapter(-1));
+  elements.next.addEventListener('click',()=>goChapter(1));
+  for(const button of document.querySelectorAll('[data-focus]'))button.addEventListener('click',()=>setFocus(button.dataset.focus));
+  document.addEventListener('keydown',event=>{
+    if(['INPUT','SELECT','BUTTON','TEXTAREA'].includes(document.activeElement?.tagName))return;
+    if(event.code==='Space'){event.preventDefault();playing?pause():play();}
+    if(event.code==='ArrowRight'){event.preventDefault();seek(time+5);}
+    if(event.code==='ArrowLeft'){event.preventDefault();seek(time-5);}
+  });
+  // Video capture is intentionally part of the offline artifact. Chunks are
+  // handed to the local recording Python process, never uploaded anywhere.
+  async function startCapture(options={}){
+    if(capture)throw Error('A recording is already active');
+    if(typeof window.__mikuVideoChunk!=='function')throw Error('Recorder callback not configured');
+    const fps=options.fps||24;
+    const from=clamp(Number(options.from)||0,0,TOTAL-.1);
+    const seconds=options.seconds==null?TOTAL-from:Math.min(Number(options.seconds),TOTAL-from);
+    if(!(seconds>0))throw Error('Recording interval must be positive');
+    pause();setSpeed(1);setFocus('full');seek(from);
+    const stream=elements.canvas.captureStream(fps);
+    const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(s=>MediaRecorder.isTypeSupported(s));
+    if(!mime)throw Error('No Chrome WebM recorder codec');
+    const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:options.bitrate||12_000_000});
+    let nextChunk=0,queue=Promise.resolve();
+    window.__mikuRecordingDone=false;window.__mikuRecordingError=null;
+    recorder.ondataavailable=event=>{
+      if(!event.data.size)return;
+      queue=queue.then(async()=>{
+        const raw=new Uint8Array(await event.data.arrayBuffer());
+        // Chunked binary-string conversion prevents argument-size overflow.
+        const pieces=[];
+        for(let i=0;i<raw.length;i+=16384)pieces.push(String.fromCharCode.apply(null,raw.subarray(i,i+16384)));
+        await window.__mikuVideoChunk(btoa(pieces.join('')),nextChunk++);
+      }).catch(e=>{window.__mikuRecordingError=String(e);});
+    };
+    recorder.onerror=event=>{window.__mikuRecordingError=event.error?.message||'MediaRecorder failed';};
+    recorder.onstop=async()=>{
+      try{await queue;window.__mikuRecordingDone=true;}
+      catch(e){window.__mikuRecordingError=String(e);}
+      finally{stream.getTracks().forEach(track=>track.stop());capture=null;}
+    };
+    capture={recorder,stream,endTime:from+seconds,stopRequested:false};
+    recorder.start(1000);
+    play();
+    return {from,seconds,fps,mime,totalDuration:TOTAL,operations:paints.length,finalPaths:finals.length};
+  }
+  function endCapture(){
+    if(!capture||capture.stopRequested)return;
+    capture.stopRequested=true;pause();
+    try{capture.recorder.requestData();capture.recorder.stop();}
+    catch(e){window.__mikuRecordingError=String(e);}
+  }
+  function publicState(){
+    const completed=completedCount(time);
+    const doneOps=paints.slice(0,completed);
+    const stageIndex=chapterAt(time);
+    return {ready:true,time,duration:TOTAL,playing,speed,focus,
+      stageIndex,currentStage:chapters[stageIndex].title,stageKind:chapters[stageIndex].kind,
+      completedSketch:strokes.filter(st=>st.end<=time).length,
+      completedUnderpainting:doneOps.filter(op=>op.phase==='under').length,
+      completedFinalPaths:doneOps.filter(op=>op.phase==='final').length,
+      underpaintingAlpha:cleanupAlpha(time),
+      underpainting:underpainting.length,paths:finals.length,strokes:strokes.length,
+      operations:paints.length,paintedOps:completed,cached,
+      sessionSha256:CFG.session_sha256};
+  }
+  window.__mikuPlayer={
+    seek,pause,play,setSpeed,setFocus,redraw,startCapture,endCapture,
+    getState:publicState,
+    chapters:chapters.map(c=>({start:c.start,end:c.end,kind:c.kind,title:c.title,ops:c.ops}))
+  };
+  window.__mikuStudio={
+    ready:true,duration:TOTAL,seek,getState:publicState,
+    canvas:elements.canvas,dataURL:()=>elements.canvas.toDataURL('image/png')
+  };
+  redraw();requestAnimationFrame(loop);
+  window.__mikuReady=true;
+})();
+</script>
+</body>
+</html>

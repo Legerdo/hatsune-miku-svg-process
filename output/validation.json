@@ -1,0 +1,82 @@
+{
+  "checks": {
+    "svg_xml_parses": true,
+    "drawing_elements_exactly_1600": true,
+    "all_drawing_elements_are_paths": true,
+    "final_session_count_matches": true,
+    "unique_path_ids": true,
+    "final_ids_match_session": true,
+    "no_embedded_or_external_raster": true,
+    "no_scripts": true,
+    "no_external_resource_attributes": true,
+    "nonempty_finite_geometry": true,
+    "no_hidden_padding_paths": true,
+    "underpainting_not_in_final_svg": true,
+    "source_sha256_matches_selected_original": true,
+    "all_reviewed_checkpoints_exist": true,
+    "overall_finish_recorded": true,
+    "video_h264": true,
+    "video_full_hd": true,
+    "video_has_decodable_frames": true,
+    "video_contains_full_length_timeline": true
+  },
+  "source_dimensions": [
+    519,
+    791
+  ],
+  "png_dimensions": [
+    2076,
+    3164
+  ],
+  "svg_viewbox": "0 0 519 791",
+  "final_drawing_elements": 1600,
+  "transient_sketch_strokes": 71,
+  "transient_underpainting_operations": 722,
+  "recorded_batches": 12,
+  "total_replay_drawing_operations": 2393,
+  "source_color_components_preserved": 50363,
+  "render_comparison": {
+    "method": "Chromium-rendered final PNG, downsampled to source resolution; foreground alpha > 90 only. Descriptive comparison, not an acceptance threshold.",
+    "mse": 39.975435126024344,
+    "psnr_db": 32.11287161200036,
+    "mae": 3.1030215517849333
+  },
+  "files": {
+    "hatsune-miku.svg": {
+      "bytes": 18940726,
+      "sha256": "638cca3aea769fee04b5a9d8529abd77c1cbb35ebc251126e755476fe0eaa8e6"
+    },
+    "hatsune-miku.png": {
+      "bytes": 1938556,
+      "sha256": "f24f6d11f4c773e0702b8cb71c3b54f40a3daf065abea4b7f4f640a92bf78dec"
+    },
+    "session.json": {
+      "bytes": 28561222,
+      "sha256": "ad00076815573508bef31b43e1c6f4420b84d25c99796f535c8eb447e220856a"
+    },
+    "hatsune-miku-process.mp4": {
+      "bytes": 7337475,
+      "sha256": "a87ad270d5c3e888bcc654321994369319a59cd59172333068e2f018b27612f1"
+    }
+  },
+  "video": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "24/1",
+        "duration": "292.000000",
+        "nb_frames": "7008",
+        "nb_read_frames": "7008"
+      }
+    ],
+    "format": {
+      "duration": "292.000000",
+      "size": "7337475"
+    }
+  },
+  "status": "PASS"
+}
